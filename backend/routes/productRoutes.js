@@ -1,0 +1,13 @@
+import express from "express"
+import { addProduct, deleteProduct, getProducts, getSingleProduct, updateProduct } from "../controllers/productController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
+import { isadmin } from "../middleware/isadmin.js";
+import upload from "../middleware/multer.js";
+const router=express.Router()
+router.post("/addProducts",verifyToken,isadmin,upload.array("images",4),addProduct)
+router.get("/getProducts",getProducts)
+router.get("/:id",getSingleProduct)
+router.put("/:id",verifyToken,isadmin,updateProduct)
+router.delete("/:id",verifyToken,isadmin,deleteProduct)
+
+export default router;

@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { IconButton } from "@mui/material";
+import { IconButton,Snackbar,Alert } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -15,15 +15,24 @@ import { useForm } from "react-hook-form";
 export default function AddProduct() {
   const navigate = useNavigate()
   const [images, setimages] = useState([])
+  const [open, setopen] = useState(false)
+  const [loading, setloading] = useState(false)
 
 const {
   register,
   handleSubmit,
+  reset,
   formState: { errors },
 } = useForm();
 
 const savingProduct= async (data)=>{
   try{
+    setloading(true)
+    if(images.length===0)
+    {
+      alert("Please upload at least one image")
+      return
+    }
     const formData=new FormData()
     formData.append("name", data.name);
     formData.append("description", data.description);
@@ -43,10 +52,18 @@ const savingProduct= async (data)=>{
         },
         body: formData,
      })
+     if(res.ok){
+     setopen(true)
+     reset()
+     setimages([])
+     }
       const result = await res.json();
     console.log(result);
   }catch(error){
      console.log(error);
+  }
+  finally{
+    setloading(false)
   }
 }
 
@@ -291,6 +308,7 @@ const savingProduct= async (data)=>{
             <Button
               type="submit"
               variant="contained"
+              disabled={loading}
               sx={{
                 borderRadius: 2,
                 px: 3,
@@ -298,11 +316,20 @@ const savingProduct= async (data)=>{
                 fontWeight: 600,
               }}
             >
-              Save Product
+              {loading ? "Saving..." : "Save Product"}
             </Button>
           </Stack>
         </Stack>
       </Paper>
+      <Snackbar
+        open={open} // if open true it will be shown else not
+        autoHideDuration={3000}
+        onClose={()=>setopen(false)}
+        >
+          <Alert severity="success" variant="filled" >
+             Product added successfully
+          </Alert>
+        </Snackbar>
     </Box>
   );
 }

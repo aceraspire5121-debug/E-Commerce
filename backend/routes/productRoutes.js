@@ -8,6 +8,6 @@ router.post("/addProducts",verifyToken,isadmin,upload.array("images",4),addProdu
 router.get("/getProducts",getProducts)
 router.get("/:id",getSingleProduct)
 router.put("/:id",verifyToken,isadmin,updateProduct)
-router.delete("/:id",verifyToken,isadmin,deleteProduct)
+router.delete("/:id",verifyToken,isadmin,deleteProduct) // jo "/:id" ye likha hai iski bajha se hi tum ab req.params.id karke nikal skte ho id
 
 export default router;

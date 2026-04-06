@@ -1,9 +1,40 @@
 import React from "react";
 import { getUserFromToken } from "../utils/auth";
+import { Snackbar, Alert } from "@mui/material";
+import { useState } from "react";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product,onDelete,onFetch }) => {
   const user = getUserFromToken();
   const isAdmin = user?.role === "admin";
+  const [open, setopen] = useState(false)
+  const [loading, setloading] = useState(false)
+
+  const deleteProduct = async () => { // ohh har function ke liye ek alag execution context banta hai jiska ek part memory space hota hai aur uski memory space me bo uske andar jo data use hota hai use store karta hai jiski bajah se jitni bar deleteProduct banega bo har bar us time avaibale product ko store kar lega jo ki bo use kar raha hai, isliye har deleteProduct ka ek alag execution context hai jiski memory me us particular card ke assosiated product store hai
+    try {
+      setloading(true)
+      const token = localStorage.getItem("CommerceToken")
+      const id = product._id
+      const res = await fetch(`http://127.0.0.1:3000/api/products/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      if (res.ok) {
+        setopen(true)
+        setTimeout(() => {
+          onDelete(product._id)
+          onFetch() // jaise hi delete ho jaye turant fetch ko call kardo
+        }, 2000);
+      }
+
+    } catch(error) {
+       console.log(error)
+     }
+     finally{
+      setloading(false)
+     }
+  }
 
   return (
     <article className="group flex flex-col rounded-2xl border border-stone-100 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition duration-300 hover:-translate-y-0.5 hover:border-teal-200/60 hover:shadow-[0_20px_40px_-28px_rgba(15,118,110,0.35)]">
@@ -27,11 +58,10 @@ const ProductCard = ({ product }) => {
 
       <div className="mt-3">
         <span
-          className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            product.stock > 0
+          className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${product.stock > 0
               ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80"
               : "bg-red-50 text-red-700 ring-1 ring-red-200/80"
-          }`}
+            }`}
         >
           {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
         </span>
@@ -48,11 +78,26 @@ const ProductCard = ({ product }) => {
           <button
             type="button"
             className="flex-1 rounded-xl border border-red-200/80 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-600 hover:text-white"
+            onClick={deleteProduct}
+            disabled={loading}
           >
-            Delete
+            {loading?"Deleting...":"Delete"}
           </button>
         </div>
       )}
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={() => setopen(false)} // jab ye band hoga to jate jate ye setopen ko false kar dega aur iski bajah se, snackbar jo ki open the open={true} par bo open=false hone par fir close ho jayega, to ek tareeke se ye apne aap ko ui se hi hide kar raha hai onclose par
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setopen(false)}
+        >
+          Product deleted successfully
+        </Alert>
+      </Snackbar>
     </article>
   );
 };

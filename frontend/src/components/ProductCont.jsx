@@ -1,22 +1,30 @@
 import React from "react";
 import ProductCard from "./Card";
 import { useState, useEffect } from "react";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUserFromToken } from "../utils/auth";
+import { Button, Box, Typography } from "@mui/material";
 
 const ProductHeader = () => {
   const user = getUserFromToken();
   const [products, setproducts] = useState([]);
-  const navigate=useNavigate()
+  const [page, setpage] = useState(1)
+  const navigate = useNavigate()
 
-  useEffect(() => {
     const gettingProducts = async () => {
-      const res = await fetch("http://127.0.0.1:3000/api/products/getProducts");
+      const res = await fetch(`http://127.0.0.1:3000/api/products/getProducts?page=${page}&limit=8`);
       const data = await res.json();
       setproducts(data.products);
     };
+
+  useEffect(() => {
     gettingProducts();
-  }, []);
+  }, [page]);
+ 
+
+  const handleDelete = (id) => {
+    setproducts((prev) => prev.filter((prod) => prod._id !== id)) // prev me peeche ke sare products, fir un products ki id se comparison
+  }
 
   return (
     <div className="w-[min(1120px,98%)] mx-auto">
@@ -68,7 +76,7 @@ const ProductHeader = () => {
               {user?.role === "admin" && (
                 <button
                   type="button"
-                  onClick={()=>navigate("/admin/products/newProduct")}
+                  onClick={() => navigate("/admin/products/newProduct")}
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/25 transition hover:from-teal-800 hover:to-teal-700"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -82,9 +90,56 @@ const ProductHeader = () => {
 
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((p) => (
-              <ProductCard key={p._id} product={p} />
+              <ProductCard key={p._id} product={p} onDelete={handleDelete} onFetch={gettingProducts} />
             ))}
           </div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 2,
+              mt: 4,
+            }}
+          >
+            <Button
+              variant="outlined"
+              disabled={page === 1}
+              onClick={() => setpage(page - 1)}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                px: 2.5,
+              }}
+            >
+              Prev
+            </Button>
+
+            <Typography
+              sx={{
+                fontWeight: 600,
+                px: 2,
+                py: 0.5,
+                borderRadius: 2,
+                bgcolor: "rgba(13, 148, 136, 0.1)",
+                color: "teal.800",
+              }}
+            >
+              Page {page}
+            </Typography>
+
+            <Button
+              variant="contained"
+              onClick={() => setpage(page + 1)}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                px: 2.5,
+              }}
+            >
+              Next
+            </Button>
+          </Box>
         </div>
       </div>
     </div>

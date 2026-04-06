@@ -10,5 +10,5 @@ import mongoose from "mongoose";
     timestamps:true
  })
 
- export const User=mongoose.model("User",userSchema)
+ export const User=mongoose.model("User",userSchema) // named export so we have to name named import
  

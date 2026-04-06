@@ -1,11 +1,13 @@
 import React from "react";
 import ProductCard from "./Card";
 import { useState, useEffect } from "react";
+import { useNavigate} from "react-router-dom";
 import { getUserFromToken } from "../utils/auth";
 
 const ProductHeader = () => {
   const user = getUserFromToken();
   const [products, setproducts] = useState([]);
+  const navigate=useNavigate()
 
   useEffect(() => {
     const gettingProducts = async () => {
@@ -66,6 +68,7 @@ const ProductHeader = () => {
               {user?.role === "admin" && (
                 <button
                   type="button"
+                  onClick={()=>navigate("/admin/products/newProduct")}
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/25 transition hover:from-teal-800 hover:to-teal-700"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -4,6 +4,7 @@ import RegisterPage from "./pages/register";
 import LoginPage from "./pages/login";
 import ProductPage from "./pages/Product";
 import AdminPage from "./pages/Admin";
+import AddProduct from "./pages/AddProduct";
 function App() {
   return (
     <BrowserRouter>
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<RegisterPage />} />
         <Route path="/user/products" element={<ProductPage/>} />
         <Route path={"/admin/products"} element={<AdminPage/>} />
+        <Route path={"/admin/products/newProduct"} element={<AddProduct/>} />
       </Routes>
     </BrowserRouter>
   );

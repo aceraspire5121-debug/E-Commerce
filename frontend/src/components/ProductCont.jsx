@@ -21,6 +21,11 @@ const ProductHeader = () => {
   useEffect(() => {
     gettingProducts();
   }, [page]);
+
+  //   useEffect(() => {
+  //   console.log(products)
+  // }, [products]);
+
  
 
   const handleDelete = (id) => {
@@ -136,6 +141,7 @@ const ProductHeader = () => {
             <Button
               variant="contained"
               onClick={() => setpage(page + 1)}
+              disabled={products<8}
               sx={{
                 textTransform: "none",
                 borderRadius: 2,

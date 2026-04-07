@@ -3,12 +3,13 @@ import ProductCard from "./Card";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserFromToken } from "../utils/auth";
-import { Button, Box, Typography } from "@mui/material";
+import { Button, Box, Typography,Snackbar,Alert } from "@mui/material";
 
 const ProductHeader = () => {
   const user = getUserFromToken();
   const [products, setproducts] = useState([]);
   const [page, setpage] = useState(1)
+  const [open, setopen] = useState(false)
   const navigate = useNavigate()
 
     const gettingProducts = async () => {
@@ -24,6 +25,10 @@ const ProductHeader = () => {
 
   const handleDelete = (id) => {
     setproducts((prev) => prev.filter((prod) => prod._id !== id)) // prev me peeche ke sare products, fir un products ki id se comparison
+  }
+
+  const handleShowMessage=()=>{
+   setopen(true)
   }
 
   return (
@@ -90,7 +95,7 @@ const ProductHeader = () => {
 
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((p) => (
-              <ProductCard key={p._id} product={p} onDelete={handleDelete} onFetch={gettingProducts} />
+              <ProductCard key={p._id} product={p} onDelete={handleDelete} onFetch={gettingProducts} onShowMessage={handleShowMessage} />
             ))}
           </div>
           <Box
@@ -142,6 +147,20 @@ const ProductHeader = () => {
           </Box>
         </div>
       </div>
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+        onClose={() => setopen(false)} // jab ye band hoga to jate jate ye setopen ko false kar dega aur iski bajah se, snackbar jo ki open the open={true} par bo open=false hone par fir close ho jayega, to ek tareeke se ye apne aap ko ui se hi hide kar raha hai onclose par
+        anchorOrigin={{ vertical: "top", horizontal: "right" }} // position lagayi hai uski
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setopen(false)}
+        >
+          Product deleted successfully
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

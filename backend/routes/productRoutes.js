@@ -7,7 +7,7 @@ const router=express.Router()
 router.post("/addProducts",verifyToken,isadmin,upload.array("images",4),addProduct)
 router.get("/getProducts",getProducts)
 router.get("/:id",getSingleProduct)
-router.put("/:id",verifyToken,isadmin,updateProduct)
+router.put("/:id",verifyToken,isadmin,upload.array("images",4),updateProduct)
 router.delete("/:id",verifyToken,isadmin,deleteProduct) // jo "/:id" ye likha hai iski bajha se hi tum ab req.params.id karke nikal skte ho id
 
 export default router;

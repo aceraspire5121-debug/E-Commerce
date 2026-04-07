@@ -6,9 +6,8 @@ const uploadToCloudinary = (buffer,originalname) => {
     return new Promise((resolve, reject) => {
 
         const stream = cloudinary.uploader.upload_stream(
-            { folder: "products",
-                public_id:originalname, // if you upload image with same name again then the new image will overwrite the previous image because of 2nd 3rd line
-                overwrite: true
+            { folder: "products", // is name ka folder ban raha hai cloudinary me jiske andar images save ho rahi hai jakar
+                public_id: `${Date.now()}-${originalname}`, // unique id hogi har ek image ki
              },
             (error, result) => {
                 if (error) reject(error)
@@ -26,7 +25,10 @@ export const addProduct = async (req, res) => {
     try {
       const uploads=req.files.map(file=>uploadToCloudinary(file.buffer,file.originalname)) // uploadtoCloudinary returns promises so uploads become an array of promises
       const result=await Promise.all(uploads) // here we wait for each promise to resolve, and promises will be resolved parallely not one by one so using this over forin loops make api 3 to 5 times faster as promises resolve simultaneously
-     const imageurls=result.map(r=>r.secure_url)
+      const imageurls=result.map(r=>({
+        url:r.secure_url,
+        public_id: r.public_id
+     }))
         const product = await Product.create({
             name: req.body.name,
             description: req.body.description,
@@ -104,7 +106,6 @@ export const getSingleProduct=async (req,res)=>{
 export const updateProduct=async (req,res)=>{
  
     try {
-
          const product=await Product.findById(req.params.id)
 
           if (!product) {
@@ -113,8 +114,26 @@ export const updateProduct=async (req,res)=>{
         message: "Product not found",
       });
     }
+ 
+    let imageurls=product.images // old images
 
-    const newProduct=await Product.findByIdAndUpdate(req.params.id,req.body, {
+if(req.files && req.files.length>0) // agar user ne new image upload kari to images section hoga, agar bo hoga to upload.array chalgea jisse req.files me available ho jata hai images ka data
+{
+    const uploads=req.files.map(file=>uploadToCloudinary(file.buffer,file.originalname)) // uploadtoCloudinary returns promises so uploads become an array of promises
+      const result=await Promise.all(uploads) // here we wait for each promise to resolve, and promises will be resolved parallely not one by one so using this over forin loops make api 3 to 5 times faster as promises resolve simultaneously
+      imageurls=result.map(r=>({
+        url:r.secure_url,
+        public_id: r.public_id
+     }))
+
+     for (let img of product.images) {
+        if(img.public_id){
+         await cloudinary.uploader.destroy(img.public_id);
+        }
+       } //new save ho gyi to purani delte kardo images cloudinary se
+}
+
+    const newProduct=await Product.findByIdAndUpdate(req.params.id,{...req.body,images:imageurls},{
         new: true, // updated data return karega
         runValidators: true, // schema validation chalega
       })

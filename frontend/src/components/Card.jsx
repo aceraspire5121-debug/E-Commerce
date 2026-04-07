@@ -2,12 +2,14 @@ import React from "react";
 import { getUserFromToken } from "../utils/auth";
 import { Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const ProductCard = ({ product,onDelete,onFetch }) => {
+const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
   const user = getUserFromToken();
   const isAdmin = user?.role === "admin";
   const [open, setopen] = useState(false)
   const [loading, setloading] = useState(false)
+  const navigate=useNavigate()
 
   const deleteProduct = async () => { // ohh har function ke liye ek alag execution context banta hai jiska ek part memory space hota hai aur uski memory space me bo uske andar jo data use hota hai use store karta hai jiski bajah se jitni bar deleteProduct banega bo har bar us time avaibale product ko store kar lega jo ki bo use kar raha hai, isliye har deleteProduct ka ek alag execution context hai jiski memory me us particular card ke assosiated product store hai
     try {
@@ -22,10 +24,10 @@ const ProductCard = ({ product,onDelete,onFetch }) => {
       })
       if (res.ok) {
         setopen(true)
-        setTimeout(() => {
-          onDelete(product._id)
-          onFetch() // jaise hi delete ho jaye turant fetch ko call kardo
-        }, 2000);
+        onDelete(product._id)
+        onShowMessage()
+        onFetch()
+        
       }
 
     } catch(error) {
@@ -40,9 +42,9 @@ const ProductCard = ({ product,onDelete,onFetch }) => {
     <article className="group flex flex-col rounded-2xl border border-stone-100 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition duration-300 hover:-translate-y-0.5 hover:border-teal-200/60 hover:shadow-[0_20px_40px_-28px_rgba(15,118,110,0.35)]">
       <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-xl bg-gradient-to-br from-stone-100 to-stone-50">
         <img
-          src={product.images?.[0] || "https://via.placeholder.com/150"}
+          src={product.images[0]?.url}
           alt={product.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.03]"
         />
       </div>
 
@@ -72,6 +74,9 @@ const ProductCard = ({ product,onDelete,onFetch }) => {
           <button
             type="button"
             className="flex-1 rounded-xl border border-stone-200 py-2 text-xs font-semibold text-stone-700 transition hover:border-teal-300 hover:bg-teal-50/50 hover:text-teal-900"
+            onClick={()=>navigate(`/admin/products/editProduct/${product._id}`,{
+              state:{product}
+            })}
           >
             Edit
           </button>
@@ -85,19 +90,6 @@ const ProductCard = ({ product,onDelete,onFetch }) => {
           </button>
         </div>
       )}
-      <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={() => setopen(false)} // jab ye band hoga to jate jate ye setopen ko false kar dega aur iski bajah se, snackbar jo ki open the open={true} par bo open=false hone par fir close ho jayega, to ek tareeke se ye apne aap ko ui se hi hide kar raha hai onclose par
-      >
-        <Alert
-          severity="success"
-          variant="filled"
-          onClose={() => setopen(false)}
-        >
-          Product deleted successfully
-        </Alert>
-      </Snackbar>
     </article>
   );
 };

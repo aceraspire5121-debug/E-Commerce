@@ -8,19 +8,26 @@ import { Button, Box, Typography,Snackbar,Alert } from "@mui/material";
 const ProductHeader = () => {
   const user = getUserFromToken();
   const [products, setproducts] = useState([]);
+  const [total, settotal] = useState(0)
   const [page, setpage] = useState(1)
   const [open, setopen] = useState(false)
   const navigate = useNavigate()
+  let totalpages;
 
     const gettingProducts = async () => {
       const res = await fetch(`http://127.0.0.1:3000/api/products/getProducts?page=${page}&limit=8`);
       const data = await res.json();
       setproducts(data.products);
+      console.log(data.totalDocuments)
+      settotal(data.totalDocuments)
     };
 
   useEffect(() => {
     gettingProducts();
   }, [page]);
+
+  totalpages=Math.ceil(total/8);
+  console.log(totalpages)
 
   //   useEffect(() => {
   //   console.log(products)
@@ -141,7 +148,7 @@ const ProductHeader = () => {
             <Button
               variant="contained"
               onClick={() => setpage(page + 1)}
-              disabled={products<8}
+              disabled={page===totalpages}
               sx={{
                 textTransform: "none",
                 borderRadius: 2,

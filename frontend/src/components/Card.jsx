@@ -1,6 +1,7 @@
 import React from "react";
 import { getUserFromToken } from "../utils/auth";
-import { Snackbar, Alert } from "@mui/material";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { Snackbar, Alert,IconButton } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -39,7 +40,7 @@ const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
   }
 
   return (
-    <article className="group flex flex-col rounded-2xl border border-stone-100 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition duration-300 hover:-translate-y-0.5 hover:border-teal-200/60 hover:shadow-[0_20px_40px_-28px_rgba(15,118,110,0.35)]">
+    <article className="group relative flex flex-col rounded-2xl border border-stone-100 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition duration-300 hover:-translate-y-0.5 hover:border-teal-200/60 hover:shadow-[0_20px_40px_-28px_rgba(15,118,110,0.35)]">
       <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-xl bg-gradient-to-br from-stone-100 to-stone-50">
         <img
           src={product.images[0]?.url}
@@ -68,6 +69,34 @@ const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
           {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
         </span>
       </div>
+
+      {!isAdmin && ( // i have given group to the parent i.e article so by this now i can apply on child whenever parent is hovered, apply group-hover.. to the child
+       <IconButton
+    className="opacity-0 translate-y-2 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-300 ease-out"
+    size="small"
+    onClick={()=>navigate("/users/cart")}
+    sx={{
+      position: "absolute",
+      bottom: 14,
+      right: 14,
+      width: 38,
+      height: 38,
+      color: "#0f766e",
+      backgroundColor: "#ffffff",
+      border: "1px solid rgba(13, 148, 136, 0.24)",
+      boxShadow: "0 10px 22px -12px rgba(15, 118, 110, 0.5)",
+      transition: "all 220ms ease",
+      "&:hover": {
+        backgroundColor: "#f0fdfa",
+        borderColor: "rgba(13, 148, 136, 0.5)",
+        boxShadow: "0 14px 26px -12px rgba(15, 118, 110, 0.6)",
+        transform: "translateY(-1px) scale(1.04)",
+      },
+    }}
+  >
+    <AddShoppingCartIcon sx={{ fontSize: 19 }} />
+  </IconButton>
+      )}
 
       {isAdmin && (
         <div className="mt-4 flex gap-2 border-t border-stone-100 pt-4">

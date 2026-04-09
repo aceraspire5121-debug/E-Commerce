@@ -12,6 +12,12 @@ const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
   const [loading, setloading] = useState(false)
   const navigate=useNavigate()
 
+  const addToCart=async ()=>{
+      const res=await fetch(`/api/cart/${product._id}`,{
+        method:"POST"
+      })
+  }
+
   const deleteProduct = async () => { // ohh har function ke liye ek alag execution context banta hai jiska ek part memory space hota hai aur uski memory space me bo uske andar jo data use hota hai use store karta hai jiski bajah se jitni bar deleteProduct banega bo har bar us time avaibale product ko store kar lega jo ki bo use kar raha hai, isliye har deleteProduct ka ek alag execution context hai jiski memory me us particular card ke assosiated product store hai
     try {
       setloading(true)
@@ -74,7 +80,7 @@ const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
        <IconButton
     className="opacity-0 translate-y-2 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-300 ease-out"
     size="small"
-    onClick={()=>navigate("/users/cart")}
+    onClick={addToCart}
     sx={{
       position: "absolute",
       bottom: 14,

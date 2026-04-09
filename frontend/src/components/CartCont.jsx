@@ -1,0 +1,203 @@
+import React from "react";
+import { useLocation } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+  Divider,
+  IconButton,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+
+const CartCont = () => {
+  const location = useLocation();
+
+  // handle both single product & multiple later
+  const cartItems = location.state?.product
+    ? [location.state.product]
+    : [];
+
+  return (
+    <Box
+      sx={{
+        minHeight: "100%",
+        py: 4,
+        px: 2,
+        background:
+          "linear-gradient(180deg, rgba(240,253,250,0.6) 0%, rgba(248,250,252,1) 45%)",
+      }}
+    >
+      <Box sx={{ width: "min(1100px, 100%)", mx: "auto" }}>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 800, letterSpacing: "-0.02em", mb: 0.5 }}
+        >
+          My Cart
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Review your selected items and place your order.
+        </Typography>
+
+        <Stack direction={{ xs: "column", lg: "row" }} spacing={3} alignItems="stretch">
+          
+          {/* Left: cart items */}
+          <Stack spacing={2.5} sx={{ flex: 1.7 }}>
+            {cartItems.map((item) => (
+              <Paper
+                key={item._id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor: "rgba(15,118,110,0.14)",
+                  boxShadow: "0 12px 30px -22px rgba(15,23,42,0.25)",
+                }}
+              >
+                <Stack direction="row" spacing={2}>
+                  <Box
+                    component="img"
+                    src={item.images?.[0]?.url || "https://via.placeholder.com/150"}
+                    alt={item.name}
+                    sx={{
+                      width: 96,
+                      height: 96,
+                      borderRadius: 2.5,
+                      objectFit: "contain",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  />
+
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                      {item.name}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+                      {item.category}
+                    </Typography>
+
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{ mt: 2 }}
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}>
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+
+                        <Typography sx={{ fontWeight: 700, minWidth: 20, textAlign: "center" }}>
+                          1
+                        </Typography>
+
+                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}>
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Typography sx={{ fontWeight: 800 }}>
+                          ₹{item.price}
+                        </Typography>
+
+                        <IconButton size="small" sx={{ color: "#ef4444", bgcolor: "rgba(239,68,68,0.08)" }}>
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
+
+          {/* Right: summary */}
+          <Paper
+            elevation={0}
+            sx={{
+              flex: 1,
+              p: 2.5,
+              borderRadius: 3,
+              border: "1px solid",
+              borderColor: "rgba(15,118,110,0.16)",
+              boxShadow: "0 16px 34px -24px rgba(15,23,42,0.25)",
+              height: "fit-content",
+              position: { lg: "sticky" },
+              top: 24,
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
+              Order Summary
+            </Typography>
+
+            <Stack spacing={1.2}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography color="text.secondary">Subtotal</Typography>
+                <Typography sx={{ fontWeight: 700 }}>
+                  ₹{cartItems.reduce((acc, item) => acc + item.price, 0)}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography color="text.secondary">Shipping</Typography>
+                <Typography sx={{ fontWeight: 700 }}>₹120</Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography color="text.secondary">Discount</Typography>
+                <Typography sx={{ fontWeight: 700, color: "#059669" }}>-₹0</Typography>
+              </Stack>
+            </Stack>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography sx={{ fontWeight: 800 }}>Total</Typography>
+              <Typography sx={{ fontWeight: 900, fontSize: "1.1rem" }}>
+                ₹{cartItems.reduce((acc, item) => acc + item.price, 0) + 120}
+              </Typography>
+            </Stack>
+
+            <TextField
+              size="small"
+              fullWidth
+              placeholder="Coupon code"
+              sx={{ mt: 2, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+            />
+
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: 2,
+                py: 1.25,
+                borderRadius: 2.5,
+                fontWeight: 800,
+                background: "linear-gradient(135deg, #0f766e 0%, #0d9488 60%, #14b8a6 100%)",
+              }}
+            >
+              Checkout
+            </Button>
+
+            <Button
+              fullWidth
+              variant="text"
+              sx={{ mt: 1, fontWeight: 700, color: "text.secondary" }}
+            >
+              Continue Shopping
+            </Button>
+          </Paper>
+        </Stack>
+      </Box>
+    </Box>
+  );
+};
+
+export default CartCont;

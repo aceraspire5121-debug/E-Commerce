@@ -93,7 +93,8 @@ const Navbar = () => {
 
           {user?.role === "user" && (
             <>
-              <Button sx={navBtn(false)} disabled>
+              <Button sx={navBtn(location.pathname==="/users/cart")}
+              onClick={()=>navigate("/users/cart")} >
                 Cart
               </Button>
               <Button sx={navBtn(false)} disabled>

@@ -20,6 +20,7 @@ await mongoose.connect(process.env.MONGO_URL)
 
 app.use("/api/users",userRoutes)
 app.use("/api/products",productRoutes)
+app.use("/api/cart",productRoutes)
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })

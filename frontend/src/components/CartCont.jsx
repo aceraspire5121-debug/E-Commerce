@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useState,useEffect } from "react";
 import {
   Box,
   Button,
@@ -15,12 +15,21 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 const CartCont = () => {
-  const location = useLocation();
-
-  // handle both single product & multiple later
-  const cartItems = location.state?.product
-    ? [location.state.product]
-    : [];
+ const [cartItems, setcartItems] = useState([])
+  useEffect(() => {
+    const token=localStorage.getItem("CommerceToken")
+    const fetchCart=async ()=>{
+     const res=await fetch("http://127.0.0.1:3000/api/cart/products",{
+        headers:{Authorization: `Bearer ${token}`},
+     })
+     const data=await res.json();
+     console.log(data.cart.items)
+     setcartItems(data.cart.items) // kyoki cart.items ek array hai
+    } 
+  fetchCart()
+    
+  }, [])
+  
 
   return (
     <Box
@@ -49,7 +58,7 @@ const CartCont = () => {
           <Stack spacing={2.5} sx={{ flex: 1.7 }}>
             {cartItems.map((item) => (
               <Paper
-                key={item._id}
+                key={item.product._id}
                 elevation={0}
                 sx={{
                   p: 2,
@@ -62,8 +71,8 @@ const CartCont = () => {
                 <Stack direction="row" spacing={2}>
                   <Box
                     component="img"
-                    src={item.images?.[0]?.url || "https://via.placeholder.com/150"}
-                    alt={item.name}
+                    src={item.product.images?.[0]?.url || "https://via.placeholder.com/150"}
+                    alt={item.product.name}
                     sx={{
                       width: 96,
                       height: 96,
@@ -75,11 +84,11 @@ const CartCont = () => {
 
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      {item.name}
+                      {item.product.name}
                     </Typography>
 
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
-                      {item.category}
+                      {item.product.category}
                     </Typography>
 
                     <Stack
@@ -94,7 +103,7 @@ const CartCont = () => {
                         </IconButton>
 
                         <Typography sx={{ fontWeight: 700, minWidth: 20, textAlign: "center" }}>
-                          1
+                          {item.quantity}
                         </Typography>
 
                         <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}>
@@ -104,7 +113,7 @@ const CartCont = () => {
 
                       <Stack direction="row" spacing={1.5} alignItems="center">
                         <Typography sx={{ fontWeight: 800 }}>
-                          ₹{item.price}
+                          ₹{item.product.price}
                         </Typography>
 
                         <IconButton size="small" sx={{ color: "#ef4444", bgcolor: "rgba(239,68,68,0.08)" }}>
@@ -141,7 +150,7 @@ const CartCont = () => {
               <Stack direction="row" justifyContent="space-between">
                 <Typography color="text.secondary">Subtotal</Typography>
                 <Typography sx={{ fontWeight: 700 }}>
-                  ₹{cartItems.reduce((acc, item) => acc + item.price, 0)}
+                  ₹{cartItems.reduce((acc, item) => acc + item.product.price, 0)}
                 </Typography>
               </Stack>
 
@@ -161,7 +170,7 @@ const CartCont = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography sx={{ fontWeight: 800 }}>Total</Typography>
               <Typography sx={{ fontWeight: 900, fontSize: "1.1rem" }}>
-                ₹{cartItems.reduce((acc, item) => acc + item.price, 0) + 120}
+                ₹{cartItems.reduce((acc, item) => acc + item.product.price, 0) + 120}
               </Typography>
             </Stack>
 

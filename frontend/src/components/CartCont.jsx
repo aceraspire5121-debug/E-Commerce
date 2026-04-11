@@ -27,8 +27,8 @@ const CartCont = () => {
      setcartItems(data.cart.items) // kyoki cart.items ek array hai
     } 
   fetchCart()
-    
   }, [])
+
   
 
   return (
@@ -98,7 +98,7 @@ const CartCont = () => {
                       sx={{ mt: 2 }}
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
-                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}>
+                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }} >
                           <RemoveIcon fontSize="small" />
                         </IconButton>
 

@@ -37,7 +37,8 @@ const RegisterPage = () => {
             //   true → status 200–299
             // false → error (400, 500 etc.)
 
-            console.log("Success", newdata.message)
+            console.log(newdata.message)
+            alert("Check your gmail to verify your email");
             navigate("/login")
         } catch (error) {
             console.log("Netword Error", error)

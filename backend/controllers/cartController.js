@@ -47,3 +47,63 @@ export const getProductsFromCart=async (req,res)=>{
         res.status(500).json({message:"Server Error"})
     }
 }
+
+export const manageQuantity=async (req,res)=>{
+    try{
+        const id=req.user.id;
+        const productId=req.params.id;
+        const product=await Product.findById(productId)
+        if(!product)
+            return res.status(404).json({success:false,message:"Product not found"}) // 404:-document not found
+        const cart=await Cart.findOne({user:id})
+        if(!cart)
+            return res.status(404).json({success:false,message:"Cart not found"})
+        const itemIndex=cart.items.findIndex((item)=>item.product.toString()===productId) // data cart me  hai to index bhi usi me dhundoge
+        if(itemIndex>-1)
+        {   
+            if(req.body.manage) 
+              cart.items[itemIndex].quantity+=1;
+            else
+            {  
+                if(cart.items[itemIndex].quantity>1)
+                  cart.items[itemIndex].quantity-=1;
+                else
+                   // await Cart.items.deleteOne(productId) // Cart is model and model are use to do direct database operations like Cart.deleteOne i.e you want to delete a particular cart then you will use model name but here you want to deelte a product inside the cart so you have to use cart which have the data of that particular cart and then save the changes
+                cart.items.splice(itemIndex,1) // itemIndex position se delete karo aur 1 hi element delete karo
+            }
+        }
+        await cart.save()
+      const updateCart=await Cart.findOne({user:id}).populate("items.product");
+      res.json({success:true,cart:updateCart})
+    }catch(err)
+    {
+      console.error(err);
+      res.status(500).json({message:"Server Error"})
+    }
+}
+
+export const deleteFromCart=async (req,res)=>{
+    try{
+        const id=req.user.id;
+        const productId=req.params.id;
+        const cart=await Cart.findOne({user:id})
+        if(!cart)
+            return res.status(404).json({success:false,message:"Cart doesnot exist"})
+        const index=cart.items.findIndex((item)=>item.product.toString()===productId);
+        if(index>-1)
+        {
+            cart.items.splice(index,1); // is index par jao items array me aur 1 document delete kardo
+        }
+        else{
+            return res.status(404).json({success:false,message:"Product does not exist"})
+        }
+        await cart.save();
+        const updatedCart = await Cart.findOne({ user: id }).populate("items.product");
+        return res.json({success:true,message:"Removed from cart successfully",cart:updatedCart})
+
+    }catch(err)
+   {
+    console.error(err);
+      res.status(500).json({message:"Server Error"})
+   }
+}

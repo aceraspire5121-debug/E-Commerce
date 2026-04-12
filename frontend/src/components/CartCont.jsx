@@ -9,6 +9,7 @@ import {
   Typography,
   Divider,
   IconButton,
+  Snackbar,Alert
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -16,6 +17,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 const CartCont = () => {
  const [cartItems, setcartItems] = useState([])
+ const [open, setopen] = useState(false)
   useEffect(() => {
     const token=localStorage.getItem("CommerceToken")
     const fetchCart=async ()=>{
@@ -29,7 +31,47 @@ const CartCont = () => {
   fetchCart()
   }, [])
 
+  const manageQuantity=async (item,manage)=>{
+       try{
+    const token=localStorage.getItem("CommerceToken");
+      const res=await fetch(`http://127.0.0.1:3000/api/cart/${item.product._id}`,{
+        method:"PUT",
+        headers:{ "Content-Type": "application/json",Authorization: `Bearer ${token}`},
+        body:JSON.stringify({manage})
+      })
+      const data=await res.json();
+      if (res.ok) {
+      console.log("Quantity Updated", data);
+    } else {
+      console.error(data.message);
+    }
+    setcartItems(data.cart.items)
+  }catch(err)
+  {
+    console.error("Error:", err);
+  }
+  }
   
+  const deleteFromCart=async (item)=>{
+ try{
+    const token=localStorage.getItem("CommerceToken");
+      const res=await fetch(`http://127.0.0.1:3000/api/cart/${item.product._id}`,{
+        method:"DELETE",
+        headers:{Authorization: `Bearer ${token}`},
+      })
+      const data=await res.json();
+      if (res.ok) {
+      console.log(data.message);
+      setopen(true)
+    } else {
+      console.error(data.message);
+    }
+    setcartItems(data.cart.items)
+  }catch(err)
+  {
+    console.error("Error:", err);
+  }
+  }
 
   return (
     <Box
@@ -98,7 +140,8 @@ const CartCont = () => {
                       sx={{ mt: 2 }}
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
-                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }} >
+                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }} 
+                       onClick={() => manageQuantity(item,false)} >
                           <RemoveIcon fontSize="small" />
                         </IconButton>
 
@@ -106,7 +149,8 @@ const CartCont = () => {
                           {item.quantity}
                         </Typography>
 
-                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}>
+                        <IconButton size="small" sx={{ border: "1px solid #e2e8f0", borderRadius: 1.5, bgcolor: "#fff" }}
+                        onClick={() => manageQuantity(item,true)}>
                           <AddIcon fontSize="small" />
                         </IconButton>
                       </Stack>
@@ -116,7 +160,8 @@ const CartCont = () => {
                           ₹{item.product.price}
                         </Typography>
 
-                        <IconButton size="small" sx={{ color: "#ef4444", bgcolor: "rgba(239,68,68,0.08)" }}>
+                        <IconButton size="small" sx={{ color: "#ef4444", bgcolor: "rgba(239,68,68,0.08)" }}
+                        onClick={()=>deleteFromCart(item)} >
                           <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                       </Stack>
@@ -150,13 +195,13 @@ const CartCont = () => {
               <Stack direction="row" justifyContent="space-between">
                 <Typography color="text.secondary">Subtotal</Typography>
                 <Typography sx={{ fontWeight: 700 }}>
-                  ₹{cartItems.reduce((acc, item) => acc + item.product.price, 0)}
+                  ₹{cartItems.reduce((acc, item) => acc + item.product.price*item.quantity, 0)}
                 </Typography>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography color="text.secondary">Shipping</Typography>
-                <Typography sx={{ fontWeight: 700 }}>₹120</Typography>
+                <Typography sx={{ fontWeight: 700 }}>{cartItems.length>0?"₹120":"₹0"}</Typography>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
@@ -170,7 +215,7 @@ const CartCont = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography sx={{ fontWeight: 800 }}>Total</Typography>
               <Typography sx={{ fontWeight: 900, fontSize: "1.1rem" }}>
-                ₹{cartItems.reduce((acc, item) => acc + item.product.price, 0) + 120}
+                ₹{cartItems.reduce((acc, item) => acc + item.product.price*item.quantity, 0) + (cartItems.length>0?120:0)}
               </Typography>
             </Stack>
 
@@ -205,6 +250,20 @@ const CartCont = () => {
           </Paper>
         </Stack>
       </Box>
+      <Snackbar
+              open={open}
+              autoHideDuration={2000}
+              onClose={() => setopen(false)} // jab ye band hoga to jate jate ye setopen ko false kar dega aur iski bajah se, snackbar jo ki open the open={true} par bo open=false hone par fir close ho jayega, to ek tareeke se ye apne aap ko ui se hi hide kar raha hai onclose par
+              anchorOrigin={{ vertical: "top", horizontal: "right" }} // position lagayi hai uski
+            >
+              <Alert
+                severity="success"
+                variant="filled"
+                onClose={() => setopen(false)}
+              >
+                Removed from cart
+              </Alert>
+            </Snackbar>
     </Box>
   );
 };

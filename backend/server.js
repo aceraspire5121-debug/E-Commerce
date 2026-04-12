@@ -4,6 +4,7 @@ import "./config/env.js" // this we have done because without it cloudinary.js g
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js"
 import productRoutes from "./routes/productRoutes.js"
+import cartRoutes from "./routes/cartRoutes.js"
 const app = express()
 app.use(cors());
 app.use(express.json())
@@ -20,7 +21,7 @@ await mongoose.connect(process.env.MONGO_URL)
 
 app.use("/api/users",userRoutes)
 app.use("/api/products",productRoutes)
-app.use("/api/cart",productRoutes)
+app.use("/api/cart",cartRoutes)
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })

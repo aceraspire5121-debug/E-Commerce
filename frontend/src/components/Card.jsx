@@ -5,7 +5,7 @@ import { Snackbar, Alert,IconButton } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
+const ProductCard = ({ product,onDelete,onFetch,onShowMessage,onShowMessage2 }) => {
   const user = getUserFromToken();
   const isAdmin = user?.role === "admin";
   const [open, setopen] = useState(false)
@@ -22,6 +22,8 @@ const ProductCard = ({ product,onDelete,onFetch,onShowMessage }) => {
       const data=await res.json();
       if (res.ok) {
       console.log("Added to cart:", data);
+      onShowMessage2()
+
     } else {
       console.error(data.message);
     }

@@ -7,17 +7,18 @@ import AdminPage from "./pages/Admin";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import Cart from "./pages/Cart";
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<RegisterPage />} />
-        <Route path="/user/products" element={<ProductPage/>} />
-        <Route path={"/admin/products"} element={<AdminPage/>} />
-        <Route path={"/admin/products/newProduct"} element={<AddProduct/>} />
-        <Route path={"/admin/products/editProduct/:id"} element={<EditProduct/>} />
-        <Route path={"/users/cart"} element={<Cart/>} />
+        <Route path="/user/products" element={<ProtectedRoute><ProductPage/></ProtectedRoute>} />
+        <Route path={"/admin/products"} element={<ProtectedRoute><AdminPage/></ProtectedRoute>} />
+        <Route path={"/admin/products/newProduct"} element={<ProtectedRoute><AddProduct/></ProtectedRoute>} />
+        <Route path={"/admin/products/editProduct/:id"} element={<ProtectedRoute><EditProduct/></ProtectedRoute>} />
+        <Route path={"/users/cart"} element={<ProtectedRoute><Cart/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
